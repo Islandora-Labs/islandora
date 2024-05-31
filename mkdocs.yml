@@ -139,6 +139,7 @@ nav:
               - 'Troubleshooting' : 'installation/docker/isle-dc/docker-troubleshooting.md'
           - 'ISLE Site Template':
               - 'Introduction to Site Template': 'installation/docker/site-template/site-template.md'
+              - 'Customizations' : 'installation/docker/site-template/customizations.md'
       - 'Ansible Playbook': 'installation/playbook.md'
       - Manual Installation:
         - 'Introduction': 'installation/manual/introduction.md'
