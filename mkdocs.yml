@@ -142,6 +142,7 @@ nav:
               - 'Introduction to Site Template': 'installation/docker/site-template/site-template.md'
               - 'Creating Your Site': 'installation/docker/site-template/setup.md'
               - 'Docker Modifications': 'installation/docker/site-template/docker-modifications.md'
+              - 'Working in Your Containers': 'installation/docker/site-template/containers.md'
               - 'Updating': 'installation/docker/site-template/updating.md'
               - 'Back Up and Restore': 'installation/docker/site-template/backup.md'
           - 'Converting ISLE-DC to Site Template': 'installation/docker/converting.md'
