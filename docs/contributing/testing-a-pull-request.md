@@ -16,6 +16,17 @@ other project that is managed by Composer.
     For those who are comfortable cloning code onto a development environment, refer to
     [Installing Git repositories with Composer](#installing-git-repositories-with-composer).
 
+!!! warning Changes to configuration
+    If the change that you're testing involves a change to default config 
+    that's shipped with a module, and the change does not update it during 
+    an update hook, then you will need to load the applicable config
+    separately. See "Updating configuration", below.
+
+!!! note File ownership
+    If possible, run the following commands as the user who owns the Drupal filesystem files.
+    This may be `nginx` or `www-data` but is probably not `root`. If you're not able to, run 
+    `chown -R [owning user] [affected files]` afterwards to reset the file ownership.jk
+
 ## Applying a Patch using Composer Patches
 
 This method is best for testing pull requests, because it's very easy to get a
@@ -44,7 +55,8 @@ For the next step, prepare the following replacement tokens:
   Example: `Updated config format https://github.com/Islandora/controlled_access_terms/issues/117`
 * `MY_PATCH_LOCATION`: Where to access the patch. See below.
 
-To get the URL of a patch for a PR, go to the PR's main URL, and append
+The patch can be entered in composer.json as either a URL or as a reference
+to a local file. To get the URL of a patch for a PR, go to the PR's main URL, and append
 `.patch` to the URL. Make sure that your URL ends with `pull/XX.patch`
 and not `pull/XX/files.patch` - the latter will not work.
 
@@ -89,6 +101,13 @@ composer update MY_PACKAGE
 The patch should apply, and then you will be running a patched version! If
 you're using a dynamic patch, then running `composer update` again should
 pull in changes to the code.
+
+Finally, update your database and clear cache:
+
+```shell
+drush updb
+drush cr
+```
 
 ## Using Composer to require a fork or branch
 
@@ -212,6 +231,13 @@ commits. Note that if you're doing this in a throwaway environment such as a VM
 or a Docker Container, you will need to configure authentication (e.g.
 install an SSH key with Github) before you can push your commits.
 
+Finally, update your database and clear cache:
+
+```shell
+drush updb
+drush cr
+```
+
 ## To reset these changes
 
 ### ... using Composer Patches
@@ -237,3 +263,42 @@ When you no longer want the custom code present simply reset the branch back to
 the default branch or tag.
 
 More great information is available in the [Composer Documentation](https://getcomposer.org/doc/).
+
+Note that when resetting changes to code, this will not reset changes made to your configuration.
+If your configuration was changed, consider setting it back.
+
+## Updating Configuration
+
+The above steps make code available to Drupal. If there is an additional configuration change that's
+needed for what you're testing and it's not addressed by an update hook, then 
+you may need to install the configuration manually.
+
+Note that these changes to configurations may override settings that you've deliberately set, so please
+back up your original configuration before proceeding! Also, there is no automated way to set configuration
+"back" to what it was, so ensure that you save a copy locally.
+
+### With Configuration Import/Export
+
+You can use Drupal's built in configuration import/export feature to export (save a copy of) your original configuration
+and to import the new configuration. This is available at Manage > Configuration > 
+Development > Configuration Synchronization > Export / Import.
+
+### With Devel's Config Editor
+
+A slightly faster method is to use the Devel module's Config Editor. It appears (if configured to) on the Devel
+toolbar. Here you can see the current configuration, save a copy, and enter the new desired configuration all 
+in one place.
+
+### With Drush
+
+Drush does not let you import a single config file, but you could export your entire site's configuration, add the new
+file to it, and re-import the entire site's configuration.
+
+```shell
+drush config:export -y
+cp [PATH_TO_FILE_ABOUT_TO_BE_OVERRIDDEN] ~ [or your desired location]
+cp [PATH_TO_CONFIG_FILE] config/sync/ 
+drush config:import -y
+```
+
+You may need to adjust file permissions (see note at top) if you're not acting as the owner of the Drupal files.
