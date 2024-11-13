@@ -90,6 +90,44 @@ The patch should apply, and then you will be running a patched version! If
 you're using a dynamic patch, then running `composer update` again should
 pull in changes to the code.
 
+(OPTIONAL) If the patch includes configs ("/install/") that need to be imported, 
+follow these steps:
+
+1. **Update Ownership**: The patch may affect module file ownership, so
+   ensure it is set correctly for the web server user:
+   ```bash
+   chown -R nginx: web/modules/contrib/MY_PACKAGE
+   ```
+
+2. **Export Configuration**: Export the current configuration before
+   making any changes:
+   ```bash
+   drush config:export -y
+   ```
+
+3. **Copy Configuration**: If the patch includes configuration that needs to
+   be imported, copy the relevant configuration file from the module to the
+   `config/sync/` directory:
+   ```bash
+   cp web/modules/contrib/MY_PACKAGE/config/install/example.yml config/sync/
+   ```
+
+4. **Update Ownership of Configuration File**: Change the ownership of the copied
+   configuration file to the web server user:
+   ```bash
+   chown -R nginx: config/sync/
+   ```
+
+5. **Import Configuration**: Import the configuration changes into the Drupal site:
+   ```bash
+   drush config:import -y
+   ```
+
+Make sure to export your existing configuration before copying over the new module
+configuration. Composer updates the ownership of module files to root, so it’s 
+essential to switch it back to the `nginx` user for both the module files and the 
+configuration files after copying.
+
 ## Using Composer to require a fork or branch
 
 This method is best if you don't have a pull request open for the code.
